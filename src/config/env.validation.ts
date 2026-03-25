@@ -6,6 +6,7 @@ export const envValidationSchema = Joi.object({
     .default('development'),
   PORT: Joi.number().default(3000),
   DATABASE_URL: Joi.string().required(),
+  DATABASE_SSL: Joi.string().valid('true', 'false').optional(),
   REDIS_URL: Joi.string().default('redis://localhost:6379'),
   CHAPA_BASE_URL: Joi.string().uri().default('https://api.chapa.co'),
   CHAPA_SECRET_KEY: Joi.string().required(),
