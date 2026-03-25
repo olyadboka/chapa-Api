@@ -1,7 +1,7 @@
 {
   "name": "chapa payment gate way",
   "version": "0.0.1",
-  "description": "",
+  "description": "NestJS REST API for Chapa payments: idempotent init, webhooks, reconciliation, Postgres + optional Redis.",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
