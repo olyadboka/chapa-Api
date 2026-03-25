@@ -18,8 +18,7 @@ export default () => {
   const redisExplicitlyDisabled = process.env.REDIS_DISABLED === 'true';
   /** Render Web Services has no Redis unless you use an add-on or external host (e.g. Upstash). */
   const redisDisabled =
-    redisExplicitlyDisabled ||
-    (nodeEnv === 'production' && !resolvedRedisUrl);
+    redisExplicitlyDisabled || (nodeEnv === 'production' && !resolvedRedisUrl);
   const redisUrl =
     resolvedRedisUrl ||
     (nodeEnv === 'production' ? '' : 'redis://localhost:6379');
