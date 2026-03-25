@@ -13,10 +13,8 @@ import { PaymentStatus } from '../database/entities/payment-status.enum';
 import { Payment } from '../database/entities/payment.entity';
 import { RedisService } from '../redis/redis.service';
 import { InitializePaymentDto } from './dto/initialize-payment.dto';
-
-function hashRequestBody(body: unknown): string {
-  return createHash('sha256').update(JSON.stringify(body)).digest('hex');
-}
+import { hashSha256Json } from '../utils/crypto';
+import { sleep } from '../utils/time';
 
 @Injectable()
 export class PaymentsService {
@@ -35,7 +33,7 @@ export class PaymentsService {
     dto: InitializePaymentDto,
     idempotencyKey: string,
   ): Promise<Record<string, unknown>> {
-    const requestHash = hashRequestBody(dto);
+    const requestHash = hashSha256Json(dto);
     const cached = await this.idempotencyRepo.findOne({
       where: { key: idempotencyKey },
     });
@@ -53,7 +51,7 @@ export class PaymentsService {
 
     const lockOk = await this.redis.acquireLock(`idem:${idempotencyKey}`, 45);
     if (!lockOk) {
-      await this.sleep(150);
+      await sleep(150);
       return this.initialize(dto, idempotencyKey);
     }
 
@@ -114,7 +112,9 @@ export class PaymentsService {
         chapaRes = await this.chapa.initializeTransaction(payload);
       } catch (err: unknown) {
         this.logger.error(
-          `Chapa initialize failed for ${txRef}: ${err instanceof Error ? err.message : err}`,
+          `Chapa initialize failed for ${txRef}: ${
+            err instanceof Error ? err.message : String(err)
+          }`,
         );
         payment.status = PaymentStatus.FAILED;
         await this.paymentRepo.save(payment);
@@ -179,15 +179,13 @@ export class PaymentsService {
     } catch (e: unknown) {
       const code = (e as { code?: string })?.code;
       if (code === '23505') {
-        this.logger.warn(`Idempotency row race for key ${key}; ignoring duplicate insert`);
+        this.logger.warn(
+          `Idempotency row race for key ${key}; ignoring duplicate insert`,
+        );
         return;
       }
       throw e;
     }
-  }
-
-  private sleep(ms: number) {
-    return new Promise((r) => setTimeout(r, ms));
   }
 
   async findByTxRef(txRef: string) {

@@ -6,24 +6,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { createHash, createHmac, timingSafeEqual } from 'crypto';
+import { createHash, createHmac } from 'crypto';
 import type { IncomingHttpHeaders } from 'http';
 import { Repository } from 'typeorm';
 import { ChapaService } from '../chapa/chapa.service';
 import { PaymentStatus } from '../database/entities/payment-status.enum';
 import { Payment } from '../database/entities/payment.entity';
 import { WebhookEvent } from '../database/entities/webhook-event.entity';
-
-function safeEqualHex(a: string, b: string): boolean {
-  try {
-    const ba = Buffer.from(a, 'utf8');
-    const bb = Buffer.from(b, 'utf8');
-    if (ba.length !== bb.length) return false;
-    return timingSafeEqual(ba, bb);
-  } catch {
-    return false;
-  }
-}
+import { safeEqualHex } from '../utils/crypto';
 
 @Injectable()
 export class WebhooksService {
