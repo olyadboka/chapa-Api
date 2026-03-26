@@ -27,7 +27,10 @@ export class ChapaService {
     private readonly http: HttpService,
     private readonly config: ConfigService,
   ) {
-    this.baseUrl = this.config.get<string>('CHAPA_BASE_URL', 'https://api.chapa.co');
+    this.baseUrl = this.config.get<string>(
+      'CHAPA_BASE_URL',
+      'https://api.chapa.co',
+    );
     this.secretKey = this.config.get<string>('CHAPA_SECRET_KEY', '');
   }
 
@@ -40,18 +43,22 @@ export class ChapaService {
 
   async initializeTransaction(payload: ChapaInitializePayload) {
     const url = `${this.baseUrl}/v1/transaction/initialize`;
-    const { data } = await firstValueFrom(
-      this.http.post(url, payload, { headers: this.authHeaders() }),
+    const response = await firstValueFrom(
+      this.http.post<Record<string, unknown>>(url, payload, {
+        headers: this.authHeaders(),
+      }),
     );
-    return data as Record<string, unknown>;
+    return response.data;
   }
 
   async verifyTransaction(txRef: string) {
     const url = `${this.baseUrl}/v1/transaction/verify/${encodeURIComponent(txRef)}`;
-    const { data } = await firstValueFrom(
-      this.http.get(url, { headers: this.authHeaders() }),
+    const response = await firstValueFrom(
+      this.http.get<Record<string, unknown>>(url, {
+        headers: this.authHeaders(),
+      }),
     );
-    return data as Record<string, unknown>;
+    return response.data;
   }
 
   /**
@@ -71,15 +78,22 @@ export class ChapaService {
       (response?.tx_ref as string);
     return {
       status: (data?.status as string) ?? (response?.status as string),
-      amount: data?.amount != null ? String(data.amount) : undefined,
+      amount:
+        typeof data?.amount === 'string' || typeof data?.amount === 'number'
+          ? `${data.amount}`
+          : undefined,
       currency: data?.currency as string | undefined,
       txRef,
       reference: (data?.reference as string) ?? undefined,
     };
   }
 
-  getCheckoutUrl(initializeResponse: Record<string, unknown>): string | undefined {
-    const data = initializeResponse?.data as Record<string, unknown> | undefined;
+  getCheckoutUrl(
+    initializeResponse: Record<string, unknown>,
+  ): string | undefined {
+    const data = initializeResponse?.data as
+      | Record<string, unknown>
+      | undefined;
     const url = data?.checkout_url ?? initializeResponse?.checkout_url;
     return typeof url === 'string' ? url : undefined;
   }

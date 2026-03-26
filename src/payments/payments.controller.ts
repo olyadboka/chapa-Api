@@ -29,13 +29,11 @@ export class PaymentsController {
     if (!idempotencyKey?.trim()) {
       throw new BadRequestException('Idempotency-Key header is required');
     }
-    const result = (await this.payments.initialize(
-      body,
-      idempotencyKey.trim(),
-    )) as Record<string, unknown>;
+    const result = await this.payments.initialize(body, idempotencyKey.trim());
 
     if (result.idempotentReplay) {
-      const { idempotentReplay: _replay, ...rest } = result;
+      const rest = { ...result };
+      delete rest.idempotentReplay;
       res.status(200);
       return rest;
     }

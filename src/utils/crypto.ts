@@ -14,4 +14,3 @@ export function safeEqualHex(a: string, b: string): boolean {
     return false;
   }
 }
-

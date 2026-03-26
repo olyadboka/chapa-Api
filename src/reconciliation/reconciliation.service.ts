@@ -42,7 +42,7 @@ export class ReconciliationService {
         results.push({
           txRef: p.txRef,
           ok: true,
-          status: r.payment.status as PaymentStatus,
+          status: r.payment.status,
         });
       } catch (e: unknown) {
         results.push({

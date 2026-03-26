@@ -18,7 +18,9 @@ export class WebhooksController {
   handle(@Req() req: RawBodyRequest<Request>) {
     const raw = req.rawBody;
     if (!raw || !Buffer.isBuffer(raw)) {
-      throw new BadRequestException('Raw body required for webhook verification');
+      throw new BadRequestException(
+        'Raw body required for webhook verification',
+      );
     }
     return this.webhooks.handleChapa(raw, req.headers);
   }

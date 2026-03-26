@@ -46,7 +46,8 @@ export class WebhooksService {
       throw new UnauthorizedException('Invalid signature');
     }
 
-    const event = String(parsed.event ?? '');
+    const parsedEvent = parsed.event;
+    const event = typeof parsedEvent === 'string' ? parsedEvent : '';
     const txRef = (parsed.tx_ref as string) ?? null;
     const reference =
       (parsed.reference as string) ?? (parsed.chapa_reference as string) ?? '';
@@ -100,10 +101,7 @@ export class WebhooksService {
 
     await this.paymentRepo.save(payment);
 
-    await this.webhookRepo.update(
-      { dedupKey },
-      { verifiedWithChapa: true },
-    );
+    await this.webhookRepo.update({ dedupKey }, { verifiedWithChapa: true });
 
     return {
       received: true,
@@ -124,8 +122,6 @@ export class WebhooksService {
     const hParsed = createHmac('sha256', secret)
       .update(JSON.stringify(parsed))
       .digest('hex');
-    return (
-      safeEqualHex(hRaw, signature) || safeEqualHex(hParsed, signature)
-    );
+    return safeEqualHex(hRaw, signature) || safeEqualHex(hParsed, signature);
   }
 }
