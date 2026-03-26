@@ -1,3 +1,8 @@
+<p align="left">
+  <img width="225" height="225" alt="image" src="https://github.com/user-attachments/assets/c2cb3686-6776-4bbd-bc6c-079084055356" style="margin-right:40px;" />
+  <img width="225" height="225" alt="image" src="https://github.com/user-attachments/assets/b6f96dcd-76e9-41e9-b25d-04a899e1594d" />
+</p>
+
 ## Chapa payment gateway
 
 REST API for payment processing with [Chapa](https://developer.chapa.co/), built with **NestJS**, **PostgreSQL** (Supabase-friendly), optional **Redis** for idempotency locks, idempotent payment creation, signed webhooks, and reconciliation helpers.
@@ -103,3 +108,5 @@ npm run test:cov
 ## License
 
 MIT
+
+Olyad Boka &copy; 2026
