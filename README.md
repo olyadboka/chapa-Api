@@ -89,13 +89,6 @@ https://<your-host>/webhooks/chapa
 
 Use the **same** secret string in the dashboard and in `CHAPA_WEBHOOK_SECRET`.
 
-## Deployment (e.g. Render)
-
-1. Set all required environment variables in the hosting dashboard.
-2. Use your public Postgres URL (Supabase) for `DATABASE_URL`.
-3. Either omit Redis variables, set `REDIS_DISABLED=true`, or provide a **hosted** Redis URL (`REDIS_URL` or `REDIS_HOST`/`REDIS_PORT`/`...`). Do **not** use `redis://localhost:6379` on Render; there is no Redis on the web instance unless you add it.
-4. Build command: `npm run build` (or your install + build pipeline). Start command: `npm run start:prod`.
-5. Free tiers may sleep; cold starts can delay the first request.
 
 ## Tests
 
