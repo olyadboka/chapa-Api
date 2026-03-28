@@ -16,7 +16,6 @@ export default () => {
   const redisUrlFromParts = buildRedisUrlFromParts();
   const resolvedRedisUrl = redisUrlDirect || redisUrlFromParts;
   const redisExplicitlyDisabled = process.env.REDIS_DISABLED === 'true';
-  /** Render Web Services has no Redis unless you use an add-on or external host (e.g. Upstash). */
   const redisDisabled =
     redisExplicitlyDisabled || (nodeEnv === 'production' && !resolvedRedisUrl);
   const redisUrl =
@@ -27,7 +26,6 @@ export default () => {
     port: parseInt(process.env.PORT ?? '3000', 10),
     nodeEnv,
     databaseUrl: process.env.DATABASE_URL,
-    /** Enable TLS for Postgres (required for Supabase). Set true or use a supabase.co host in DATABASE_URL. */
     databaseSsl:
       process.env.DATABASE_SSL === 'true' ||
       (process.env.DATABASE_URL ?? '').includes('supabase.co'),
