@@ -18,4 +18,5 @@ export const envValidationSchema = Joi.object({
   CHAPA_SECRET_KEY: Joi.string().required(),
   CHAPA_WEBHOOK_SECRET: Joi.string().required(),
   API_KEY: Joi.string().allow('').default(''),
+  CORS_ORIGIN: Joi.string().allow('').default('*'),
 });
