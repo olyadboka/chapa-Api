@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHash } from 'crypto';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { ChapaService } from '../chapa/chapa.service';
 import { IdempotencyKey } from '../database/entities/idempotency-key.entity';
 import { PaymentStatus } from '../database/entities/payment-status.enum';
@@ -37,9 +37,7 @@ export class PaymentsService {
     idempotencyKey: string,
   ): Promise<Record<string, unknown>> {
     const requestHash = hashSha256Json(dto);
-    const cached = await this.idempotencyRepo.findOne({
-      where: { key: idempotencyKey },
-    });
+    const cached = await this.findValidIdempotencyKey(idempotencyKey);
     if (cached) {
       if (cached.requestHash !== requestHash) {
         throw new ConflictException(
@@ -69,9 +67,7 @@ export class PaymentsService {
     }
 
     try {
-      const again = await this.idempotencyRepo.findOne({
-        where: { key: idempotencyKey },
-      });
+      const again = await this.findValidIdempotencyKey(idempotencyKey);
       if (again) {
         if (again.requestHash !== requestHash) {
           throw new ConflictException(
@@ -199,6 +195,25 @@ export class PaymentsService {
       }
       throw e;
     }
+  }
+
+  private async findValidIdempotencyKey(
+    key: string,
+  ): Promise<IdempotencyKey | null> {
+    const record = await this.idempotencyRepo.findOne({ where: { key } });
+    if (!record) return null;
+    if (record.expiresAt < new Date()) {
+      await this.idempotencyRepo.remove(record);
+      return null;
+    }
+    return record;
+  }
+
+  async deleteExpiredKeys(): Promise<number> {
+    const result = await this.idempotencyRepo.delete({
+      expiresAt: LessThan(new Date()),
+    });
+    return result.affected ?? 0;
   }
 
   async findByTxRef(txRef: string) {

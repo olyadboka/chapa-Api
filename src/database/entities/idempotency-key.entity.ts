@@ -1,4 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryColumn } from 'typeorm';
+
+const IDEMPOTENCY_TTL_HOURS = 24;
 
 @Entity({ name: 'idempotency_keys' })
 export class IdempotencyKey {
@@ -16,4 +18,12 @@ export class IdempotencyKey {
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
+
+  @Index()
+  @Column({
+    type: 'timestamptz',
+    default: () =>
+      `NOW() + INTERVAL '${IDEMPOTENCY_TTL_HOURS} hours'`,
+  })
+  expiresAt!: Date;
 }
