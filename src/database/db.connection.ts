@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
@@ -14,6 +15,8 @@ export const createDatabaseConfig = (
     ssl: ssl ? { rejectUnauthorized: false } : false,
     autoLoadEntities: true,
     synchronize: nodeEnv !== 'production',
+    migrationsRun: nodeEnv === 'production',
+    migrations: [join(__dirname, 'migrations', '*{.ts,.js}')],
     logging: nodeEnv === 'development',
   };
 };
