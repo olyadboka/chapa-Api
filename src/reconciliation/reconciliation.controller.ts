@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { ReconciliationService } from './reconciliation.service';
 
 @Controller('reconciliation')
-@UseGuards(ApiKeyGuard)
+@UseGuards(ThrottlerGuard, ApiKeyGuard)
 export class ReconciliationController {
   constructor(private readonly reconciliation: ReconciliationService) {}
 

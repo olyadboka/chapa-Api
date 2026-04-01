@@ -53,7 +53,11 @@ export class PaymentsService {
     }
 
     let lockOk = false;
-    for (let attempt = 0; attempt < PaymentsService.MAX_LOCK_RETRIES; attempt++) {
+    for (
+      let attempt = 0;
+      attempt < PaymentsService.MAX_LOCK_RETRIES;
+      attempt++
+    ) {
       lockOk = await this.redis.acquireLock(`idem:${idempotencyKey}`, 45);
       if (lockOk) break;
       await sleep(PaymentsService.LOCK_RETRY_DELAY_MS);

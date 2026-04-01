@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { ChapaModule } from './chapa/chapa.module';
 import configuration from './config/configuration';
@@ -16,6 +17,9 @@ import { WebhooksModule } from './webhooks/webhooks.module';
       isGlobal: true,
       load: [configuration],
       validationSchema: envValidationSchema,
+    }),
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: 60_000, limit: 30 }],
     }),
     DatabaseModule,
     RedisModule,
