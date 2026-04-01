@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PaymentStatus } from '../database/entities/payment-status.enum';
@@ -7,11 +8,29 @@ import { PaymentsService } from '../payments/payments.service';
 
 @Injectable()
 export class ReconciliationService {
+  private readonly logger = new Logger(ReconciliationService.name);
+
   constructor(
     @InjectRepository(Payment)
     private readonly paymentRepo: Repository<Payment>,
     private readonly payments: PaymentsService,
   ) {}
+
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async scheduledReconciliation() {
+    this.logger.log('Scheduled reconciliation started');
+    const result = await this.reconcilePending(50);
+    this.logger.log(
+      `Scheduled reconciliation done: ${result.scanned} scanned`,
+    );
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_3AM)
+  async scheduledIdempotencyCleanup() {
+    this.logger.log('Expired idempotency key cleanup started');
+    const deleted = await this.payments.deleteExpiredKeys();
+    this.logger.log(`Expired idempotency key cleanup done: ${deleted} removed`);
+  }
 
   async summary() {
     const raw = await this.paymentRepo
