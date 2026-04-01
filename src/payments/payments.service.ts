@@ -29,6 +29,9 @@ export class PaymentsService {
     private readonly redis: RedisService,
   ) {}
 
+  private static readonly MAX_LOCK_RETRIES = 10;
+  private static readonly LOCK_RETRY_DELAY_MS = 150;
+
   async initialize(
     dto: InitializePaymentDto,
     idempotencyKey: string,
@@ -49,10 +52,16 @@ export class PaymentsService {
       };
     }
 
-    const lockOk = await this.redis.acquireLock(`idem:${idempotencyKey}`, 45);
+    let lockOk = false;
+    for (let attempt = 0; attempt < PaymentsService.MAX_LOCK_RETRIES; attempt++) {
+      lockOk = await this.redis.acquireLock(`idem:${idempotencyKey}`, 45);
+      if (lockOk) break;
+      await sleep(PaymentsService.LOCK_RETRY_DELAY_MS);
+    }
     if (!lockOk) {
-      await sleep(150);
-      return this.initialize(dto, idempotencyKey);
+      throw new ConflictException(
+        'Could not acquire idempotency lock; a concurrent request may be in progress',
+      );
     }
 
     try {
