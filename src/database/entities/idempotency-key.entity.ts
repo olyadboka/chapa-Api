@@ -3,17 +3,17 @@ import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
 @Entity({ name: 'idempotency_keys' })
 export class IdempotencyKey {
   @PrimaryColumn({ type: 'varchar', length: 255 })
-  key: string;
+  key!: string;
 
   @Column({ type: 'varchar', length: 64 })
-  requestHash: string;
+  requestHash!: string;
 
   @Column({ type: 'int' })
-  httpStatus: number;
+  httpStatus!: number;
 
   @Column({ type: 'jsonb' })
-  responseBody: Record<string, unknown>;
+  responseBody!: Record<string, unknown>;
 
   @CreateDateColumn({ type: 'timestamptz' })
-  createdAt: Date;
+  createdAt!: Date;
 }

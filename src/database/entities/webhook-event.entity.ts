@@ -8,26 +8,26 @@ import {
 @Entity({ name: 'webhook_events' })
 export class WebhookEvent {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ type: 'varchar', length: 64, unique: true })
-  dedupKey: string;
+  dedupKey!: string;
 
   @Column({ type: 'varchar', length: 120 })
-  eventType: string;
+  eventType!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  txRef: string | null;
+  txRef!: string | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  chapaReference: string | null;
+  chapaReference!: string | null;
 
   @Column({ type: 'jsonb' })
-  payload: Record<string, unknown>;
+  payload!: Record<string, unknown>;
 
   @Column({ type: 'boolean', default: false })
-  verifiedWithChapa: boolean;
+  verifiedWithChapa!: boolean;
 
   @CreateDateColumn({ type: 'timestamptz' })
-  receivedAt: Date;
+  receivedAt!: Date;
 }
