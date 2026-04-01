@@ -42,7 +42,7 @@ export class PaymentsController {
       if (result.error === 'Chapa initialize request failed') {
         res.status(502);
       } else {
-        res.status(200);
+        res.status(422);
       }
       return result;
     }
