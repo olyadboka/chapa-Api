@@ -101,8 +101,4 @@ npm run test:e2e
 npm run test:cov
 ```
 
-## License
-
-MIT
-
 Olyad Boka &copy; 2026
