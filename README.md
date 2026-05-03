@@ -40,7 +40,7 @@ docker compose up -d
 Run the app:
 
 ```bash
-# development (watch)
+
 npm run start:dev
 
 # production build
